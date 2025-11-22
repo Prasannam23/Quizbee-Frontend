@@ -10,8 +10,13 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = getCookie('token');
+    console.log('🔍 Axios interceptor - All cookies:', document.cookie);
+    console.log('🔍 Axios interceptor - Token from getCookie:', token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('✅ Authorization header added:', `Bearer ${token}`);
+    } else {
+      console.warn('⚠️  No token found in cookies for request:', config.url);
     }
     return config;
   },
