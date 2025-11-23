@@ -41,6 +41,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       set({ loading: true });
       const res = await api.post(`/auth/login?role=${role}`, { email, password });
+      console.log('✅ Login successful');
+      console.log('📦 Login response:', res.data);
+      
+      // Store token in localStorage as well since cookie might not be accessible
+      const token = res.data.token || res.data.user?.token;
+      if (token) {
+        localStorage.setItem('token', token);
+        console.log('💾 Token saved to localStorage');
+      }
+      
+      console.log('🍪 Cookies after login:', document.cookie);
       set({ user: res.data.user, error: null, isInitialized: true });
     } catch (err: unknown) {
       const errorMessage = err instanceof Error && 'response' in err 

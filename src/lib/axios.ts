@@ -10,13 +10,11 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = getCookie('token');
-    console.log('🔍 Axios interceptor - All cookies:', document.cookie);
-    console.log('🔍 Axios interceptor - Token from getCookie:', token);
     if (token) {
+      // Add token to Authorization header (requires backend CORS to allow it)
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('✅ Authorization header added:', `Bearer ${token}`);
-    } else {
-      console.warn('⚠️  No token found in cookies for request:', config.url);
+      // Also try sending as custom header that might bypass preflight
+      config.headers['X-Auth-Token'] = token;
     }
     return config;
   },
