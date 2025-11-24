@@ -37,7 +37,7 @@ export default function SignInPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `http://localhost:8000/api/auth/google?role=${role}`;
+    window.location.href = `https://quizappbackend.duckdns.org/api/auth/google?role=${role}`;
   };
 
   return (
