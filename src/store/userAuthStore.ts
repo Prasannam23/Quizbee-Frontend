@@ -95,8 +95,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       localStorage.removeItem("token");
       await api.post("/auth/logout");
       set({ user: null, isInitialized: true });
-    } catch (error) {
-      console.error("Logout failed:", error);
+    } catch {
+      // Silently handle logout errors
     }
   },
 
@@ -108,7 +108,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       set({ loading: true });
       const res = await api.get("/user/me");
       set({ user: res.data.user, error: null, isInitialized: true });
-    } catch (error) {
+    } catch {
       set({ user: null, error: "Not authenticated", isInitialized: true });
     } finally {
       set({ loading: false });
