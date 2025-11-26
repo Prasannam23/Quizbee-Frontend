@@ -2,18 +2,18 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`,
-  withCredentials: true, // <--- required for sending cookies
 });
 
-// Request interceptor
+// Request interceptor to attach token manually
 api.interceptors.request.use(
   (config) => {
-    // No manual token attaching here — cookie will be sent automatically.
+    const token = localStorage.getItem('token'); // get JWT from localStorage
+    if (token && config.headers) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor
@@ -22,7 +22,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       console.warn("Unauthorized: token expired or not logged in.");
-      // Optional: redirect or clear user session
+      // Optional: redirect to login
       // Router.push("/signin");
     }
     return Promise.reject(error);
