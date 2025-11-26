@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import api from "@/lib/axios";
 import { User, Role } from "@/types/globaltypes";
+import { AxiosError } from "axios";
 
 export type { Role };
 
@@ -15,6 +16,10 @@ interface AuthStore {
   login: (email: string, password: string, role: Role) => Promise<void>;
   logout: () => Promise<void>;
   getMe: () => Promise<void>;
+}
+
+interface ErrorResponse {
+  error?: string;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -41,7 +46,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       }
 
       set({ user: res.data.user, error: null, isInitialized: true });
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as AxiosError<ErrorResponse>;
       set({
         error: err?.response?.data?.error || "Registration failed",
         isInitialized: true,
@@ -70,7 +76,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       }
 
       set({ user: res.data.user, error: null, isInitialized: true });
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as AxiosError<ErrorResponse>;
       set({
         error: err?.response?.data?.error || "Login failed",
         isInitialized: true,
@@ -88,8 +95,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       localStorage.removeItem("token");
       await api.post("/auth/logout");
       set({ user: null, isInitialized: true });
-    } catch (err) {
-      console.error("Logout failed:", err);
+    } catch (error) {
+      console.error("Logout failed:", error);
     }
   },
 
@@ -101,7 +108,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       set({ loading: true });
       const res = await api.get("/user/me");
       set({ user: res.data.user, error: null, isInitialized: true });
-    } catch (err) {
+    } catch (error) {
       set({ user: null, error: "Not authenticated", isInitialized: true });
     } finally {
       set({ loading: false });
